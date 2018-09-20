@@ -147,6 +147,7 @@ public class WeekView extends View {
     private int mNewEventLengthInMinutes = 60;
     private int mNewEventTimeResolutionInMinutes = 15;
     private boolean mShowFirstDayOfWeekFirst = false;
+	private int mSideBarWidth = 12;
 
     private boolean mIsFirstDraw = true;
     private boolean mAreDimensionsInvalid = true;
@@ -494,6 +495,7 @@ public class WeekView extends View {
             if (a.getBoolean(R.styleable.WeekView_dropListenerEnabled, false))
                 this.enableDropListener();
             mMinOverlappingMinutes = a.getInt(R.styleable.WeekView_minOverlappingMinutes, 0);
+			mSideBarWidth = a.getDimensionPixelSize(R.styleable.WeekView_sideBarWidth, mSideBarWidth);
         } finally {
             a.recycle();
         }
@@ -1089,7 +1091,20 @@ public class WeekView extends View {
                             right > mHeaderColumnWidth &&
                             bottom > mHeaderHeight + mHeaderRowPadding * 2 + mTimeTextHeight / 2 + mHeaderMarginBottom
                             ) {
-                        mEventRects.get(i).rectF = new RectF(left, top, right, bottom);
+
+                        int sideBarSize = 0;
+						if (mEventRects.get(i).event.getSideBarColor() == 0) {
+                            mEventRects.get(i).rectF = new RectF(left, top, right, bottom);
+                        } else {
+                            sideBarSize = mSideBarWidth;
+                            RectF sideBarRect = new RectF(left, top, left + sideBarSize, bottom);
+                            mEventRects.get(i).rectF = new RectF(left + sideBarSize, top, right, bottom);
+                            mEventBackgroundPaint.setColor(mEventRects.get(i).event.getSideBarColor());
+                            mEventBackgroundPaint.setShader(mEventRects.get(i).event.getShader());
+
+							canvas.drawRoundRect(sideBarRect, mEventCornerRadius, mEventCornerRadius, mEventBackgroundPaint);
+						}
+
                         mEventBackgroundPaint.setColor(mEventRects.get(i).event.getColor() == 0 ? mDefaultEventColor : mEventRects.get(i).event.getColor());
                         mEventBackgroundPaint.setShader(mEventRects.get(i).event.getShader());
                         canvas.drawRoundRect(mEventRects.get(i).rectF, mEventCornerRadius, mEventCornerRadius, mEventBackgroundPaint);
@@ -1098,9 +1113,9 @@ public class WeekView extends View {
                             topToUse = mHourHeight * getPassedMinutesInDay(mMinTime, 0) / 60 + getEventsTop();
 
                         if (!mNewEventIdentifier.equals(mEventRects.get(i).event.getIdentifier()))
-                            drawEventTitle(mEventRects.get(i).event, mEventRects.get(i).rectF, canvas, topToUse, left);
+                            drawEventTitle(mEventRects.get(i).event, mEventRects.get(i).rectF, canvas, topToUse, left + sideBarSize);
                         else
-                            drawEmptyImage(mEventRects.get(i).event, mEventRects.get(i).rectF, canvas, topToUse, left);
+                            drawEmptyImage(mEventRects.get(i).event, mEventRects.get(i).rectF, canvas, topToUse, left + sideBarSize);
 
                     } else
                         mEventRects.get(i).rectF = null;
@@ -1142,11 +1157,23 @@ public class WeekView extends View {
                             right > mHeaderColumnWidth &&
                             bottom > 0
                             ) {
-                        mEventRects.get(i).rectF = new RectF(left, top, right, bottom);
+						int sideBarSize = 0;
+						if (mEventRects.get(i).event.getSideBarColor() == 0) {
+							mEventRects.get(i).rectF = new RectF(left, top, right, bottom);
+						} else {
+							sideBarSize = mSideBarWidth;
+							RectF sideBarRect = new RectF(left, top, left + sideBarSize, bottom);
+							mEventRects.get(i).rectF = new RectF(left + sideBarSize, top, right, bottom);
+							mEventBackgroundPaint.setColor(mEventRects.get(i).event.getSideBarColor());
+							mEventBackgroundPaint.setShader(mEventRects.get(i).event.getShader());
+
+							canvas.drawRoundRect(sideBarRect, mEventCornerRadius, mEventCornerRadius, mEventBackgroundPaint);
+						}
+
                         mEventBackgroundPaint.setColor(mEventRects.get(i).event.getColor() == 0 ? mDefaultEventColor : mEventRects.get(i).event.getColor());
                         mEventBackgroundPaint.setShader(mEventRects.get(i).event.getShader());
                         canvas.drawRoundRect(mEventRects.get(i).rectF, mEventCornerRadius, mEventCornerRadius, mEventBackgroundPaint);
-                        drawEventTitle(mEventRects.get(i).event, mEventRects.get(i).rectF, canvas, top, left);
+                        drawEventTitle(mEventRects.get(i).event, mEventRects.get(i).rectF, canvas, top, left + sideBarSize);
                     } else
                         mEventRects.get(i).rectF = null;
                 }
@@ -2487,6 +2514,14 @@ public class WeekView extends View {
 
     public void setNewEventIconDrawable(Drawable newEventIconDrawable) {
         this.mNewEventIconDrawable = newEventIconDrawable;
+    }
+
+    public int getSideBarWidth() {
+        return mSideBarWidth;
+    }
+
+    public void setSideBarWidth(int sideBarWidth) {
+        mSideBarWidth = sideBarWidth;
     }
 
     public void enableDropListener() {

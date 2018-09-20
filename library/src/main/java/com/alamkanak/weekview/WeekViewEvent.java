@@ -22,7 +22,10 @@ public class WeekViewEvent {
     private
     @ColorInt
     int mColor;
-    private boolean mAllDay;
+	private
+	@ColorInt
+	int mSideBarColor;
+	private boolean mAllDay;
     private Shader mShader;
 
     public WeekViewEvent() {
@@ -245,6 +248,16 @@ public class WeekViewEvent {
     public void setColor(int color) {
         this.mColor = color;
     }
+
+	public
+	@ColorInt
+	int getSideBarColor() {
+		return mSideBarColor;
+	}
+
+	public void setSideBarColor(int sideBarColor) {
+		this.mSideBarColor = sideBarColor;
+	}
 
     public boolean isAllDay() {
         return mAllDay;
