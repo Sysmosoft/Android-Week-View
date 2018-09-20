@@ -336,6 +336,7 @@ public class WeekViewEvent {
                 WeekViewEvent eventMore = new WeekViewEvent(this.getIdentifier(), this.getName(), null, overDay, endOfOverDay, this.isAllDay());
                 eventMore.setColor(this.getColor());
                 eventMore.setSideBarColor(this.getSideBarColor());
+                eventMore.setAllDay(true);
                 events.add(eventMore);
 
                 // Add next day.
